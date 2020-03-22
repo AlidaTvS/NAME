@@ -28,6 +28,7 @@ function setup() {
 function ballReset(){
 ballX = canvasWidth/2;
 ballY = canvasHeight/2;
+velocity = -velocity;
 }
 //een functie om iets te tekenen.
 function draw() {
