@@ -1,3 +1,4 @@
+//dit zijn allemaal variabelen die we later gebruiken
 let backgroundColor=0;
 let canvasWidth=600;
 let canvasHeight=400;
@@ -5,57 +6,114 @@ let paddleWidth=5;
 let paddleHeight=60;
 let leftPaddleY = canvasHeight/2 - paddleHeight/2;
 let rightPaddleY = canvasHeight/2 - paddleHeight/2;
-let ballY = 195;
-let ballX = 295;
+let ballY = 200;
+let ballX = 300;
 let velocity= 2;
+let yVelocity= 0;
 let leftPaddleX= 10;
-let rightPaddleX= 585; 
+let rightPaddleX= 585;
+let stip = [];
+let dSize = 10;
+let speler1score = 0;
+let speler2score = 0;
 
-function setup() { 
+function setup() {
     createCanvas(canvasWidth, canvasHeight);
+  
+  for(let y = dSize/2; y<canvasHeight; y+=dSize*2) {
+    stip.push(createVector(width/2-dSize/2, y));
+  }
 }
-
-function draw() { 
-    background(backgroundColor); 
+//deze functie gebruiken we om een soort loop te creëeren, zodat het spel opnieuw begint als er een punt wordt gemaakt.
+function ballReset(){
+ballX = canvasWidth/2;
+ballY = canvasHeight/2;
+}
+//een functie om iets te tekenen.
+function draw() {
+    background(backgroundColor);
     rect(leftPaddleX,leftPaddleY,paddleWidth,paddleHeight);
-    rect(rightPaddleX,rightPaddleY,paddleWidth,paddleHeight); 
-    ellipse(ballX,ballY,10); 
-    ballX= ballX+velocity;
-    
-   if (ballHitPaddle()) { 
-   velocity = -velocity 
+    rect(rightPaddleX,rightPaddleY,paddleWidth,paddleHeight);
+    ellipse(ballX,ballY,10);
+//De volgende TEKST staat voor de score, links van speler 1 en rechts van speler 2.
+    text(speler1score, canvasWidth/4, canvasHeight/5);
+    text(speler2score, 3*canvasWidth/4, canvasHeight/5);
+    textSize(50);
+    textAlign(CENTER);
+  
+    ballX= ballX-velocity;
+    ballY= ballY-yVelocity;
+  //Als de bal 1 van de balkjes raakt van de spelers, draait de snelheid om, dus gaat de bal de andere kant weer op.
+   if (ballHitPaddle()) {
+   velocity = -velocity
      
     let leftPaddleMiddle = leftPaddleY + paddleHeight / 2;
     let rightPaddleMiddle = rightPaddleY + paddleHeight / 2;
      
-     
-   } 
-
-   if(keyIsDown(UP_ARROW)){ 
-   rightPaddleY = rightPaddleY - 3; 
-   } 
-
-   if(keyIsDown(DOWN_ARROW)){ 
-   rightPaddleY = rightPaddleY + 3; 
-   } 
-
-   if(keyIsDown(81)){ 
-   leftPaddleY = leftPaddleY - 3; 
-   } 
-
-   if(keyIsDown(65)){ 
-   leftPaddleY = leftPaddleY + 3; 
+    if (ballX < leftPaddleX) {
+      yVelocity = (leftPaddleMiddle - ballY) / 6;
+    }
+     else {
+       yVelocity = (rightPaddleMiddle - ballY) / 6;
+     }
    }
+  
+   if (ballY < 0 || ballY > canvasHeight) {
+     yVelocity = -yVelocity;
+   }
+  //als de bal aan de linkerkant het einde van het speelveld raakt, krijgt rechts een punt. 
+   if (ballX < 0){
+     console.log("Rechts Wint!!!");
+     textSize(50);
+     textAlign(CENTER);
+//zo gaat er een punt bij de score op
+     speler2score++;
+//hiermee reset je het spel, een soort loop. 
+     ballReset()
+   }
+  
+   if (ballX > canvasWidth){
+     console.log("Links Wint!!!");
+     textSize(50);
+     textAlign(CENTER);
+     speler1score++;
+     ballReset();
+   }
+  
+//als je een bepaalde knop indrukt, gaat je balkje omhoog of omlaag.
+   if(keyIsDown(UP_ARROW)){
+   rightPaddleY = rightPaddleY - 3;
+   }
+  
+   if(keyIsDown(DOWN_ARROW)){
+   rightPaddleY = rightPaddleY + 3;
+   }
+  
+   if(keyIsDown(87)){
+   leftPaddleY = leftPaddleY - 3;
+   }
+  
+   if(keyIsDown(83)){
+   leftPaddleY = leftPaddleY + 3;
+   }
+  
+   noStroke();
+   fill(225);
+   drawStip();
 }
 
+
+
+
 function ballHitPaddle(){
+  
 // linker Paddle
   if (ballY > leftPaddleY &&
       ballY < leftPaddleY + paddleHeight &&
     ballX < leftPaddleX){
   return true;
-    
   }
+  
   // Rechter paddle
   if (ballY > rightPaddleY &&
       ballY < rightPaddleY + paddleHeight &&
@@ -65,4 +123,14 @@ function ballHitPaddle(){
   
 // geen paddle
   return false;
+}
+
+function drawStip() {
+  for(let i=0; i<stip.length; i++) {
+    let x = stip[i].x;
+    let y = stip[i].y;
+    
+    rect(x,y,dSize,dSize)
+  }
+    
 }
